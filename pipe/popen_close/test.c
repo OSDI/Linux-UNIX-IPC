@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define MAXLINE	(4096)
 #define PAGER	"${PAGER:-more}"
@@ -14,8 +15,8 @@ int main(int argc, const char *argv[])
 {
 	FILE *fpin, *fpout;
 	char line[MAXLINE];
-	extern FILE *popen_m(const char *command, const char *type);
-	extern int pclose_m(FILE *stream);
+//	extern FILE *popen_m(const char *command, const char *type);
+//	extern int pclose_m(FILE *stream);
 	
 	if (argc != 2) {
 		fprintf(stderr, "Usage: %s + <pathname>\n", argv[0]);
@@ -27,14 +28,18 @@ int main(int argc, const char *argv[])
 		err_sys("fopen error: ");
 	}
 	
-	if (!(fpout = popen_m(PAGER, "w"))) {
+	if (!(fpout = popen(PAGER, "w"))) {
 		err_sys("popen error: ");
 	}
 
+	size_t n = 0;
 	while (fgets(line, MAXLINE, fpin) != NULL) {
+		n += strlen(line);
 		if (fputs(line, fpout) == EOF) {
 			err_sys("fputs error: ");
 		}
+		sleep(1);
+		printf("n = %zu\n", n);
 	}
 	if (ferror(fpin)) {
 		err_sys("fgets error: ");
